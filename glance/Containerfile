@@ -1,36 +1,38 @@
-# usage: podman build -t glance:24 . 
-# First stage: Build environment
+# usage - build image: podman build -t glance:24 .
+# usage - run container: podman run -d -p 8080:8080 glance:24
+ 
+# FIRST STAGE: Build environment
 FROM node:24 AS builder
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
 # Clone the Glance repository
-RUN git --version
-RUN git clone https://github.com/kitware/glance.git
+RUN git --version && git clone https://github.com/kitware/glance.git
 
 # Set the working directory to the Glance directory
 WORKDIR /usr/src/app/glance
 
 # Install dependencies
-RUN npm install
+RUN npm install &&  npx update-browserslist-db@latest --yes && npm install webpack@latest webpack-cli@latest --save-dev
 
 # Build the project
 RUN npm run build:release
 
-# Second stage: Production environment (lighter image)
+# SECOND STAGE: Production environment (lighter image)
 FROM node:24-slim
 
 # Install a simple HTTP server (to serve the built app)
+
 RUN npm install -g http-server
 
 # Set the working directory for the final image
 WORKDIR /usr/src/app
 
 # Copy the built application from the builder stage
-COPY --from=builder /usr/src/app/glance/dist /usr/src/app
+COPY --from=builder /usr/src/app/glance/dist /usr/src/app/dist
 
-# Expose the port that the HTTP server will run on
+# Note the port that the HTTP server will run on for documentation's sake
 EXPOSE 8080
 
 # Run the HTTP server to serve the built app
