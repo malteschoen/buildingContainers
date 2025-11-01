@@ -1,1 +1,5 @@
-as of 30th Oct 2025, only has a container for kitwares [ParaView Glance](https://github.com/kitware/glance.git), a browser-based diet version of ParaView, if you will
+as of 30th Oct 2025, the following things are held here:
+
+| name | link | what it is |
+|---|
+| glance  | ghcr.io/malteschoen/glance:latest | [ParaView Glance](https://github.com/kitware/glance.git is a browser-based diet version of ParaView |
