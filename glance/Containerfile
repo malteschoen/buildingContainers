@@ -1,5 +1,5 @@
-# usage - build image: podman build -t glance:24 .
-# usage - run container: podman run -d -p 8080:8080 glance:24
+# usage when building image: podman build -t glance:24 .
+# usage when running container: podman run -d -p 8080:8080 glance:24
  
 # FIRST STAGE: Build environment
 FROM node:24 AS builder
@@ -20,20 +20,16 @@ RUN npm install &&  npx update-browserslist-db@latest --yes && npm install webpa
 RUN npm run build:release
 
 # SECOND STAGE: Production environment (lighter image)
-FROM node:24-slim
 
-# Install a simple HTTP server (to serve the built app)
+# Production environment: serve with Python HTTP server (slimmest possible)
+FROM python:3.12-slim
 
-RUN npm install -g http-server
-
-# Set the working directory for the final image
 WORKDIR /usr/src/app
 
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/glance/dist /usr/src/app/dist
 
-# Note the port that the HTTP server will run on for documentation's sake
 EXPOSE 8080
 
-# Run the HTTP server to serve the built app
-CMD ["http-server", "-p", "8080", "dist"]
+# Serve content using Python's built-in HTTP server
+CMD ["python", "-m", "http.server", "8080", "--directory", "dist"]
