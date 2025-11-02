@@ -11,3 +11,8 @@ Some general hints:
 - podman tag localhost/[NAME_GOES_HERE]:[TAG_GOES_HERE] ghcr.io/malteschoen/[NAME_GOES_HERE]:[TAG_GOES_HERE]
 - podman login ghcr.io -u malteschoen -p [ACCESS_TOKEN_GOES_HERE]
 - podman push ghcr.io/malteschoen/[NAME_GOES_HERE]:[TAG_GOES_HERE]
+
+- podman manifest create ghcr.io/malteschoen/[NAME_GOES_HERE]:latest
+- podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest ghcr.io/malteschoen/[NAME_GOES_HERE]:amd64
+- podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest ghcr.io/malteschoen/[NAME_GOES_HERE]:arm64
+- podman manifest push --all ghcr.io/malteschoen/[NAME_GOES_HERE]:latest docker://ghcr.io/malteschoen/[NAME_GOES_HERE]:latest
