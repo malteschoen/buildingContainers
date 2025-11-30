@@ -4,6 +4,8 @@ as of 30th Nov 2025, the following things are held here:
 |---|---|---|
 | glance  | ghcr.io/malteschoen/glance:latest | [ParaView Glance](https://github.com/kitware/glance.git) is a browser-based diet version of ParaView |
 | paraview-superbuild  | link to container to follow | [ParaView Superbuild](https://gitlab.kitware.com/paraview/paraview-superbuild) allows you to build paraview with odd features like osmesa |
+| paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting will also need to be provided. | 
+
 
 
 Some general hints:
