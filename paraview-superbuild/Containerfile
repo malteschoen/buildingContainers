@@ -1,33 +1,46 @@
-# Use Fedora 42 as the base image
-FROM fedora:42
+# USAGE podman build  --network slirp4netns -t superbuild:arm64 .
+
+ARG UBUNTU_VERSION=24.04
+FROM ubuntu:${UBUNTU_VERSION} AS base
 
 # Install system dependencies including Mesa and development tools
-RUN dnf install -y \
+RUN apt-get update  && apt-get install -y \
     cmake \
+    file \
     git \
     gcc \
-    gcc-c++ \
+    g++ \
     make \
+    build-essential \
+    pkg-config \
+    python3 \
+    bison \
+    flex \
+    patchelf \
     ninja-build \
     wget \
     curl \
-    qt5-qtbase-devel \
-    fftw3-devel \
-    eigen3-devel \
-    boost-devel \
-    libpng-devel \
-    libtiff-devel \
-    libjpeg-devel \
-    mesa-libOSMesa-devel \  # OSMesa development libraries
-    mesa-libGL-devel \     # OpenGL libraries for additional rendering support
-    libX11-devel \         # X11 development libraries for Mesa
-    && dnf clean all
+    qtbase5-dev \         
+    libfftw3-dev \        
+    libeigen3-dev \       
+    libboost-dev \        
+    libpng-dev \          
+    libtiff-dev \        
+    libjpeg-dev \         
+    libosmesa6-dev \      
+    libgl1-mesa-dev \     
+    libx11-dev            
+
+# clean-up (might be unncessary in the long run)
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /workspace
 
 # Clone the ParaView Superbuild repository
-RUN git clone --recursive https://gitlab.kitware.com/paraview/paraview-superbuild.git
+RUN if [ ! -d "paraview-superbuild" ]; then git clone https://gitlab.kitware.com/paraview/paraview-superbuild.git; fi
+WORKDIR /workspace/paraview-superbuild
+RUN git submodule init && git submodule update
 
 # Set the working directory to the ParaView Superbuild directory
 WORKDIR /workspace/paraview-superbuild
@@ -35,8 +48,8 @@ WORKDIR /workspace/paraview-superbuild
 # Configure and build ParaView with OSMesa enabled
 RUN mkdir build \
     && cd build \
-    && cmake .. -DParaView_ENABLE_OSMESA=ON \  # Enable OSMesa
-    && make -j$(nproc)  # Use all available cores for faster builds
+    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -Dmesa_USE_SWR=OFF -DUSE_SYSTEM_python=ON \
+    && make -j4  
 
 # Set environment variables for ParaView
 ENV PATH=/workspace/paraview-superbuild/build/bin:$PATH

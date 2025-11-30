@@ -4,12 +4,15 @@ as of 30th Nov 2025, the following things are held here:
 |---|---|---|
 | glance  | ghcr.io/malteschoen/glance:latest | [ParaView Glance](https://github.com/kitware/glance.git) is a browser-based diet version of ParaView |
 | paraview-superbuild  | link to container to follow | [ParaView Superbuild](https://gitlab.kitware.com/paraview/paraview-superbuild) allows you to build paraview with odd features like osmesa |
-| paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting will also need to be provided. | 
+| paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting (apache?) will also need to be provided. | 
 
 
 
 Some general hints:
 ```
+//if needed, use this as  well
+podman build --network slirp4netns -t
+
 //lines below build images in current folder, provided a dockerfile/containerfile exists there
 //it his highly recommended to use arm64 and amd64 as tags
 podman build -t --arch arm64 [NAME_GOES_HERE]:[TAG_GOES_HERE] .
