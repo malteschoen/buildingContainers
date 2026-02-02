@@ -1,14 +1,28 @@
-as of 30th Nov 2025, the following things are held here:
+# Quickstarts
+```
+podman run -d -p 8080:8080 ghcr.io/malteschoen/glance
+```
+```
+//preparations - getting the demo-problem-description-file to your sfepy-folder
+mkdir /home/$USER/sfepy
+wget https://sfepy.org/doc-devel/_downloads/3cd1878c07bae0901512d51fed780b36/poisson_short_syntax.py
+//run interactively (meaning you gotta type in "sfepy-run poisson_short_syntax.py" next)
+podman run -it -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash
+//run batch-mode/hands-off
+podman run -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash -c "sfepy-run /shared/poisson_short_syntax.py"
+```
+# List of contents:
 
 | name | link | what it is |
 |---|---|---|
 | glance  | ghcr.io/malteschoen/glance:latest | [ParaView Glance](https://github.com/kitware/glance.git) is a browser-based diet version of ParaView |
 | paraview-superbuild  | link to container to follow | [ParaView Superbuild](https://gitlab.kitware.com/paraview/paraview-superbuild) allows you to build paraview with odd features like osmesa |
 | paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting (apache?) will also need to be provided. | 
+| sfepy | ghcr.io/malteschoen/sfepy:latest | [sfepy](https://sfepy.org/doc-devel/index.html) is an user-friendly modular FEM toolbox in python - sadly, their container doesn't play nice with udocker, so I had to make my own | 
 
 
 
-Some general hints:
+# Some general hints:
 ```
 //if needed, use this as  well
 podman build --network slirp4netns -t

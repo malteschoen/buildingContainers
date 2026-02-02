@@ -1,0 +1,12 @@
+# take care:  your are required to create a folder named "sfepy" in your home folder and put the problem-description-file (e.g. poisson_short_syntax.py) there
+# usage when building image for arm64/aarch64: podman build --arch arm64 -t ghcr.io/malteschoen/sfepy:arm64 .
+# usage when building image for amd64/x86-64: podman build --arch amd64 -t ghcr.io/malteschoen/sfepy:amd64 .
+# usage when running container interactively: podman run -it -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash
+# usage when running container hands-off: podman run -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash -c "sfepy-run /shared/poisson_short_syntax.py"
+ 
+# get python3
+FROM python:3.9
+
+# try to install sfepy with pip, get an older version of numpy first
+RUN pip install "numpy<2.0"
+RUN pip install sfepy
