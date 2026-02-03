@@ -1,0 +1,35 @@
+# take care:  your are required to create a folder named "gmsh" in your home folder and put your input files (e.g. step files) there
+# usage when building image for arm64/aarch64: podman build --arch arm64 -t ghcr.io/malteschoen/gmsh:arm64 .
+# usage when building image for amd64/x86-64: podman build --arch amd64 -t ghcr.io/malteschoen/gmsh:amd64 .
+# usage when running container interactively: podman run -it -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash
+# usage when running container hands-off: podman run -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash -c "foo bar lorem ipsum"
+ 
+# Stage 1: Build gmsh from source
+FROM ubuntu:24.04 AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libocct-foundation-dev \
+    cmake \
+    build-essential \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone gmsh repository
+WORKDIR /gmsh
+RUN git clone https://gitlab.onelab.info/gmsh/gmsh.git .
+
+# Create build directory and run cmake with FLTK disabled
+RUN mkdir build && cd build && \
+    cmake -DENABLE_FLTK=0 -DENABLE_BUILD_DYNAMIC=1 .. && \
+    make -j$(nproc)
+
+# Stage 2: Minimal runtime container with gmsh executable
+FROM ubuntu:24.04
+
+# Copy gmsh executable from builder stage
+COPY --from=builder /gmsh/build/gmsh /usr/local/bin/gmsh
+
+
+
