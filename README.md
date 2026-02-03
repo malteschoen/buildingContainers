@@ -15,11 +15,11 @@ podman run -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash -c "
 
 | name | link | what it is |
 |---|---|---|
-| glance  | ghcr.io/malteschoen/glance:latest | [ParaView Glance](https://github.com/kitware/glance.git) is a browser-based diet version of ParaView |
+| glance | [glance](ghcr.io/malteschoen/glance:latest) | [ParaView Glance](https://github.com/kitware/glance.git) is a browser-based diet version of ParaView |
 | paraview-superbuild  | link to container to follow | [ParaView Superbuild](https://gitlab.kitware.com/paraview/paraview-superbuild) allows you to build paraview with odd features like osmesa |
 | paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting (apache?) will also need to be provided. | 
-| sfepy | ghcr.io/malteschoen/sfepy:latest | [sfepy](https://sfepy.org/doc-devel/index.html) is an user-friendly modular FEM toolbox in python - sadly, their container doesn't play nice with udocker, so I had to make my own | 
-
+| sfepy | [sfepy](ghcr.io/malteschoen/sfepy:latest) | [sfepy](https://sfepy.org/doc-devel/index.html) is an user-friendly modular FEM toolbox in python - sadly, their container doesn't play nice with udocker, so I had to make my own | 
+| gmsh | [gmsh](ghcr.io/malteschoen/gmsh:latest) | [gmsh](https://gmsh.info/) is a baller software for automatable generation of (mostly tet)  mesh - sadly, no recent arm64 container is offered, so I had to make my own | 
 
 
 # Some general hints:
