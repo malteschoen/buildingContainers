@@ -1,4 +1,4 @@
-# Quickstarts
+# Quickstarts on a boring standard linux machine
 ```
 podman run -d -p 8080:8080 ghcr.io/malteschoen/glance
 ```
@@ -8,8 +8,6 @@ mkdir /home/$USER/sfepy
 wget https://sfepy.org/doc-devel/_downloads/3cd1878c07bae0901512d51fed780b36/poisson_short_syntax.py
 //run interactively (meaning you gotta type in "sfepy-run poisson_short_syntax.py" next)
 podman run -it -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash
-//run batch-mode/hands-off
-podman run -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash -c "sfepy-run /shared/poisson_short_syntax.py"
 ```
 # List of contents:
 
@@ -44,9 +42,14 @@ podman push ghcr.io/malteschoen/[NAME_GOES_HERE]:[TAG_GOES_HERE]
 // line below creates manifest on GHCR  
 podman manifest create ghcr.io/malteschoen/[NAME_GOES_HERE]:latest
 
-// lines below add amd64 and arm64 versions of image to manifest
+// lines below add amd64 and arm64 versions of image (2nd entry each) to manifest (first entry gives name in manifest)
 podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest ghcr.io/malteschoen/[NAME_GOES_HERE]:amd64
 podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest ghcr.io/malteschoen/[NAME_GOES_HERE]:arm64
+
+// should for some reason the above fail, you can use this to make clear that a remote or local image is meant
+podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest docker://ghcr.io/malteschoen/[NAME_GOES_HERE]:arm64
+podman manifest add ghcr.io/malteschoen/[NAME_GOES_HERE]:latest containers-storage://ghcr.io/malteschoen/[NAME_GOES_HERE]:arm64
+
 
 // line below pushes manifest to GHCR so that both amd and arm version are available from the same link
 podman manifest push --all ghcr.io/malteschoen/[NAME_GOES_HERE]:latest docker://ghcr.io/malteschoen/[NAME_GOES_HERE]:latest
