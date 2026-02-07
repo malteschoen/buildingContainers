@@ -9,6 +9,11 @@ wget https://sfepy.org/doc-devel/_downloads/3cd1878c07bae0901512d51fed780b36/poi
 //run interactively (meaning you gotta type in "sfepy-run poisson_short_syntax.py" next)
 podman run -it -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash
 ```
+//preparations -
+mkdir /home/$USER/gmsh
+//run interactively (meaning you gotta type in "gmesh input.step -check" next)
+podman run -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash
+```
 # List of contents:
 
 | name | link | what it is |
