@@ -1,4 +1,5 @@
 ### take care:  your are required to create a folder named "gmsh" in your home folder and put your input files (e.g. step files) there
+
 ### usage when building image for arm64/aarch64:
 '''
 podman build --arch arm64 -t ghcr.io/malteschoen/gmsh:arm64 .
@@ -13,7 +14,7 @@ podman run -it -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash
 '''
 ### usage when running container hands-off: 
 '''
-podman run -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash -c "gmsh -3 -format msh -o intermediate.msh settings.geo
+podman run -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash -c "gmsh -3 -format msh2 -o intermediate.msh settings.geo
 '''
 ### usage A when running container interactively under udocker on your phone:
 '''
@@ -29,5 +30,10 @@ udocker run --name=gmsh --pull=reuse  -v /scratch:/shared ghcr.io/malteschoen/gm
 '''
 ### usage when running container hands-off under udocker:
 '''
-udocker run --name=gmsh --pull=reuse  -v /scratch:/shared ghcr.io/malteschoen/gmsh  /bin/bash -c "gmsh -3 -format msh -o intermediate.msh settings.geo"
+udocker run --name=gmsh --pull=reuse  -v /scratch:/shared ghcr.io/malteschoen/gmsh  /bin/bash -c "gmsh -3 -format msh2 -o intermediate.msh settings.geo"
+'''
+
+### cabinet of oddities
+'''
+gmsh input.unv -3 -setnumber Mesh.SubdivisionAlgorithm 2 -format msh2 -o model_hex.mshee
 '''
