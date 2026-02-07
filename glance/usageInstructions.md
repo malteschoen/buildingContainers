@@ -10,3 +10,7 @@ podman build --arch amd64 -t ghcr.io/malteschoen/glance:amd64 .
 ```
 podman run -d -p 8080:8080 ghcr.io/malteschoen/glance:arm64
 ```
+### usage under udocker
+```
+udocker --insecure run  --pull=reuse --name=glance -p 8080:8080 ghcr.io/malteschoen/glance:arm64
+```
