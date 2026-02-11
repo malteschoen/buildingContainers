@@ -4,3 +4,4 @@ FROM python:3.9
 # try to install sfepy with pip, get an older version of numpy first
 RUN pip install "numpy<2.0"
 RUN pip install sfepy
+RUN pip install gmesh
