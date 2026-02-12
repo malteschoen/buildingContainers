@@ -1,13 +1,17 @@
 # Quickstarts on a boring standard linux machine
+## GLANCE
 ```
 podman run -d -p 8080:8080 ghcr.io/malteschoen/glance
 ```
+## SFEPY
 ```
 //preparations - getting the demo-problem-description-file to your sfepy-folder
 mkdir /home/$USER/sfepy
 wget https://sfepy.org/doc-devel/_downloads/3cd1878c07bae0901512d51fed780b36/poisson_short_syntax.py
 //run interactively (meaning you gotta type in "sfepy-run poisson_short_syntax.py" next)
 podman run -it -v /home/$USER/sfepy:/shared ghcr.io/malteschoen/sfepy /bin/bash
+```
+## GMSH
 ```
 //preparations -
 mkdir /home/$USER/gmsh
@@ -43,6 +47,10 @@ podman login ghcr.io -u malteschoen -p [PERSONAL_ACCESS_TOKEN_GOES_HERE]
 
 // line below pushes image to GHCR
 podman push ghcr.io/malteschoen/[NAME_GOES_HERE]:[TAG_GOES_HERE]
+
+//short primer on manifests
+//- can only be created, never edited
+//- can only reference objects on 'their own platform' (so you must push onto it first)
 
 // line below creates manifest on GHCR  
 podman manifest create ghcr.io/malteschoen/[NAME_GOES_HERE]:latest
