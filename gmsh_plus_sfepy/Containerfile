@@ -1,0 +1,47 @@
+# Stage 1: Build gmsh from source
+FROM python:3.9.25-slim-trixie as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libocct-foundation-dev \
+    libocct-data-exchange-dev \
+    libocct-modeling-algorithms-dev \
+    libocct-modeling-data-dev \
+    libocct-ocaf-dev \
+    cmake \
+    build-essential \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone gmsh repository
+WORKDIR /gmsh
+RUN git clone https://gitlab.onelab.info/gmsh/gmsh.git .
+
+# Create build directory and run cmake with FLTK disabled
+# might also use -DENABLE_BUILD_DYNAMIC=1 for gmsh APIs (e.g. Python)
+# probably not needed, like the 'make install'
+RUN mkdir build && cd build && \
+    cmake -DENABLE_FLTK=0 -DENABLE_BUILD_DYNAMIC=1 -DENABLE_OCC=1 .. && \
+    make -j$(nproc)
+
+
+# Stage 2: Minimal runtime container with gmsh executable
+FROM python:3.9.25-slim-trixie
+
+# Copy installed gmsh files from builder
+COPY --from=builder /usr/local/bin/gmsh /usr/local/bin/gmsh
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    libocct-foundation-dev \
+    libocct-data-exchange-dev \
+    libocct-modeling-algorithms-dev \
+    libocct-modeling-data-dev \
+    libocct-ocaf-dev \ 
+    libocct-foundation-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install "numpy<2.0"
+RUN pip install sfepy
+

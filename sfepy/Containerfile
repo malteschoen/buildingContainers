@@ -1,11 +1,6 @@
-# get python3
+# get python3 (maybe 3.9.25-slim-trixie?)
 FROM python:3.9
 
 # try to install sfepy with pip, get an older version of numpy first
 RUN pip install "numpy<2.0"
 RUN pip install sfepy
-
-#try to install gmsh (needs some packages for some reason)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gmsh \
-    && rm -rf /var/lib/apt/lists/*
