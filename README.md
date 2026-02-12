@@ -27,6 +27,8 @@ podman run -v /home/$USER/gmsh:/shared ghcr.io/malteschoen/gmsh /bin/bash
 | paraview-visualizer  | link to container to follow | [ParaView Visualizer](https://github.com/Kitware/visualizer) uses a web interface to access paraview - the battleplan is to use a lightweight image (or 24.04 from microfluidica) and copy over the Paraview files. Simple hosting (apache?) will also need to be provided. | 
 | sfepy | [sfepy](ghcr.io/malteschoen/sfepy:latest) | [sfepy](https://sfepy.org/doc-devel/index.html) is an user-friendly modular FEM toolbox in python - sadly, their container doesn't play nice with udocker, so I had to make my own | 
 | gmsh | [gmsh](ghcr.io/malteschoen/gmsh:latest) | [gmsh](https://gmsh.info/) is a baller software for automatable generation of (mostly tet)  mesh - sadly, no recent arm64 container is offered, so I had to make my own | 
+| gmsh_plus_sfepy | [gmsh_plus_sfepy](ghcr.io/malteschoen/gmsh_plus_sfepy:latest) | [gmsh](https://gmsh.info/) and [sfepy](https://sfepy.org/doc-devel/index.html) in the same container. Not efficient, not smart, but convenient. | 
+
 
 
 # Some general hints:
