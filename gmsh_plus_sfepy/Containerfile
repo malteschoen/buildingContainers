@@ -1,5 +1,5 @@
 # Stage 1: Build gmsh from source
-FROM python:3.9.25-slim-trixie as builder
+FROM python:3.9.25-slim-trixie as gmsh-builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,22 +25,41 @@ RUN mkdir build && cd build && \
     make -j$(nproc) && \
     make install
 
-# Stage 2: Minimal runtime container with gmsh executable
-FROM python:3.9.25-slim-trixie
-
-# Copy installed gmsh files from builder
-COPY --from=builder /usr/local/bin/gmsh /usr/local/bin/gmsh
-
+# Stage 2: we now install/build sfepy
+FROM python:3.9.25-slim-trixie as sfepy-builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgomp1 \
-    libocct-foundation-dev \
-    libocct-data-exchange-dev \
-    libocct-modeling-algorithms-dev \
-    libocct-modeling-data-dev \
-    libocct-ocaf-dev \ 
-    libocct-foundation-dev \
     && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-RUN pip install "numpy<2.0"
-RUN pip install sfepy
+# Upgrade pip and install the wheel package
+RUN pip install --upgrade pip wheel
+
+# Download/build sfepy and requirements and store them under /wheels
+RUN pip wheel "sfepy" "numpy<2.0" -w /wheels
+RUN ls -lah /wheels
+
+# Stage 3: throw everything together
+FROM python:3.9.25-slim-trixie
+
+# Copy compiled and installed gmsh files from gmsh-builder
+COPY --from=gmsh-builder /usr/local/bin/gmsh /usr/local/bin/gmsh
+#COPY --from=gmsh-builder /usr/local /usr/local
+# check which libraries gmsh links at runtime (currently commented out) 
+# RUN ldd /usr/local/bin/gmsh
+
+# Copy wheels from sfepy-builder and install them
+COPY --from=sfepy-builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/*.whl
+
+# get the stuff that gmsh needs to run, extend library path and check again if stuff's present
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    #libocct-foundation-dev \
+    #libocct-data-exchange-dev \
+    libocct-data-exchange-dev \
+    #libocct-modeling-algorithms-dev \
+    #libocct-modeling-data-dev \
+    #libocct-ocaf-dev \
+    && rm -rf /var/lib/apt/lists/*
+RUN ldd /usr/local/bin/gmsh
