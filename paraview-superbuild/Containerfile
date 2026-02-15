@@ -1,7 +1,5 @@
-# USAGE podman build  --network slirp4netns -t superbuild:arm64 .
-
 ARG UBUNTU_VERSION=24.04
-FROM ubuntu:${UBUNTU_VERSION} AS base
+FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 # Install system dependencies including Mesa and development tools
 RUN apt-get update  && apt-get install -y \
@@ -29,31 +27,37 @@ RUN apt-get update  && apt-get install -y \
     libjpeg-dev \         
     libosmesa6-dev \      
     libgl1-mesa-dev \     
-    libx11-dev            
+    libx11-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*           
 
-# clean-up (might be unncessary in the long run)
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+#set the environmental variables to use my big /shared/tmp as TMP instead of the tiny default one
+ENV TMPDIR=/shared/tmp
+ENV TEMP=/shared/tmp
+ENV TMP=/shared/tmp
 
 # Set the working directory
-WORKDIR /workspace
+WORKDIR /shared/workspace
 
 # Clone the ParaView Superbuild repository
 RUN if [ ! -d "paraview-superbuild" ]; then git clone https://gitlab.kitware.com/paraview/paraview-superbuild.git; fi
-WORKDIR /workspace/paraview-superbuild
+WORKDIR /shared/workspace/paraview-superbuild
 RUN git submodule init && git submodule update
 
 # Set the working directory to the ParaView Superbuild directory
-WORKDIR /workspace/paraview-superbuild
+WORKDIR /shared/workspace/paraview-superbuild
 
 # Configure and build ParaView with OSMesa enabled
 RUN mkdir build \
     && cd build \
-    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -Dmesa_USE_SWR=OFF -DUSE_SYSTEM_python=ON \
+    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -Dmesa_USE_SWR=ON -DUSE_SYSTEM_python=ON \
     && make -j4  
 
 # Set environment variables for ParaView
-ENV PATH=/workspace/paraview-superbuild/build/bin:$PATH
-ENV LD_LIBRARY_PATH=/workspace/paraview-superbuild/build/lib:$LD_LIBRARY_PATH
+ENV PATH="/shared/workspace/paraview-superbuild/build/install/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/shared/workspace/paraview-superbuild/build/install/lib:${LD_LIBRARY_PATH}"
+ENV PYTHONPATH=/shared/workspace/paraview-superbuild/build/install/lib/python3.12/site-packages:$PYTHONPATH
+
 
 # Default command to run ParaView
-CMD ["/workspace/paraview-superbuild/build/bin/paraview"]
+CMD ["/shared/workspace/paraview-superbuild/build/install/bin/paraview"]
