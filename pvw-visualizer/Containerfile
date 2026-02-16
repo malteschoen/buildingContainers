@@ -1,0 +1,13 @@
+ARG UBUNTU_VERSION=24.04
+FROM ubuntu:${UBUNTU_VERSION} AS runner
+
+# Install system dependencies including Mesa and development tools
+RUN apt-get update  && apt-get install -y \
+    npm \
+    python3-pip \
+    python3.12-venv \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*           
+
+RUN npm install -g pvw-visualizer
+RUN python3 -m venv visualizerVENV
+RUN . ./visualizerVENV/bin/activate && pip install vtk[web]

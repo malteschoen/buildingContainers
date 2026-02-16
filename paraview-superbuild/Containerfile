@@ -20,7 +20,9 @@ RUN apt-get update  && apt-get install -y \
     curl \
     qtbase5-dev \         
     libfftw3-dev \        
-    libeigen3-dev \       
+    libeigen3-dev \
+    libssl-dev \
+    openssl \    
     libboost-dev \        
     libpng-dev \          
     libtiff-dev \        
@@ -42,15 +44,17 @@ WORKDIR /shared/workspace
 # Clone the ParaView Superbuild repository
 RUN if [ ! -d "paraview-superbuild" ]; then git clone https://gitlab.kitware.com/paraview/paraview-superbuild.git; fi
 WORKDIR /shared/workspace/paraview-superbuild
-RUN git submodule init && git submodule update
+RUN git submodule init
+RUN git checkout v5.12.1
+RUN git submodule update
 
 # Set the working directory to the ParaView Superbuild directory
 WORKDIR /shared/workspace/paraview-superbuild
 
 # Configure and build ParaView with OSMesa enabled
-RUN mkdir build \
-    && cd build \
-    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -Dmesa_USE_SWR=ON -DUSE_SYSTEM_python=ON \
+# RUN mkdir build 
+RUN cd build \
+    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -DUSE_SYSTEM_python=ON \
     && make -j4  
 
 # Set environment variables for ParaView
@@ -59,5 +63,3 @@ ENV LD_LIBRARY_PATH="/shared/workspace/paraview-superbuild/build/install/lib:${L
 ENV PYTHONPATH=/shared/workspace/paraview-superbuild/build/install/lib/python3.12/site-packages:$PYTHONPATH
 
 
-# Default command to run ParaView
-CMD ["/shared/workspace/paraview-superbuild/build/install/bin/paraview"]
