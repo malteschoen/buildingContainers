@@ -54,7 +54,7 @@ WORKDIR /shared/workspace/paraview-superbuild
 # Configure and build ParaView with OSMesa enabled
 # RUN mkdir build 
 RUN cd build \
-    && cmake .. -DParaView_ENABLE_OSMESA=ON -DENABLE_paraviewweb=ON -DUSE_SYSTEM_python=ON \
+    && cmake .. -DParaView_ENABLE_osmesa=ON -DENABLE_paraviewweb=ON \
     && make -j4  
 
 # Set environment variables for ParaView
