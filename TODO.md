@@ -1,0 +1,6 @@
+- add bempp documentation
+- add felupe container & documentation
+- reorganize gmsh containers (ubuntu versus manually built)
+- maybe add a 'fresh' bempp container (nightly builds)
+- figure out a more clever way for termux
+- complete usage instructions for gmsh_plus_sfepy

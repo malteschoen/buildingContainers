@@ -4,7 +4,7 @@ podman build --volume /media/xubuntu/jesus1/shared:/shared --arch arm64 -t ghcr.
 ```
 ### testing
 ```
-podman run -dit --volume /media/xubuntu/jesus1/shared:/shared ghcr.io/malteschoen/paraview-superbuild:arm64 /bin/bash
+podman run -it --volume /media/xubuntu/jesus1/shared:/shared ghcr.io/malteschoen/paraview-superbuild:arm64 /bin/bash
 ```
 
 
