@@ -1,3 +1,11 @@
+//what we would need next
+//24 per half-circle
+//R-Tree
+//NetGen opt AND normal opt
+//minimum and maximum mesh size (ratio 10?)
+//
+
+
 Merge "input.step";
 
 // Collect all surfaces
@@ -21,5 +29,6 @@ Physical Volume("fluid") = {vols[]};
 
 Field[1] = MathEval;
 Field[1].F = "10";
+Background Field = 1;
 
 Mesh.SubdivisionAlgorithm = 2;
