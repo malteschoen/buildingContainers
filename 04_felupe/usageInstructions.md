@@ -8,9 +8,14 @@ podman build --arch arm64 -t ghcr.io/malteschoen/felupe:arm64 .
 podman build --arch amd64 -t ghcr.io/malteschoen/felupe:amd64 .
 ```
 
-### usage when running container interactively:
+### usage A when running container interactively:
 ```
 podman run -it -v /home/$USER/felupe:/shared ghcr.io/malteschoen/felupe /bin/bash
+```
+
+### usage B when running container interactively:
+```
+podman run -it -v /media/xubuntu/jesus1/github:/shared ghcr.io/malteschoen/felupe /bin/bash
 ```
 
 ### usage A when running container interactively under udocker on your phone: 
