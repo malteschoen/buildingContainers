@@ -38,13 +38,15 @@ COPY --from=builder /usr/local/bin/gmsh /usr/local/bin/gmsh
 # Ensure runtime loader finds gmsh shared libs
 # ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
+# install what's needed for gmsh to ingest step files
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
-    libocct-foundation-dev \
+    #libocct-foundation-dev \
+    #libocct-data-exchange-dev \
     libocct-data-exchange-dev \
-    libocct-modeling-algorithms-dev \
-    libocct-modeling-data-dev \
-    libocct-ocaf-dev \ 
-    libocct-foundation-dev \
+    #libocct-modeling-algorithms-dev \
+    #libocct-modeling-data-dev \
+    #libocct-ocaf-dev \
+    && rm -rf /var/lib/apt/lists/*
     && rm -rf /var/lib/apt/lists/*
 

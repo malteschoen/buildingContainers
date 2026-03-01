@@ -52,7 +52,7 @@ COPY --from=gmsh-builder /usr/local/bin/gmsh /usr/local/bin/gmsh
 COPY --from=sfepy-builder /wheels /wheels
 RUN pip install --no-cache-dir /wheels/*.whl
 
-# get the stuff that gmsh needs to run, extend library path and check again if stuff's present
+# install what's needed for gmsh to ingest step files
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     #libocct-foundation-dev \
@@ -62,4 +62,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     #libocct-modeling-data-dev \
     #libocct-ocaf-dev \
     && rm -rf /var/lib/apt/lists/*
+# check again if stuff's present
 RUN ldd /usr/local/bin/gmsh
