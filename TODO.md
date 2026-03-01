@@ -1,6 +1,10 @@
 - add bempp documentation
 - add felupe container & documentation
-- reorganize gmsh containers (ubuntu versus manually built)
+- reorganize everything (!) to build things from git
+- rework the sfepy container (install gmsh from ubuntu)
 - maybe add a 'fresh' bempp container (nightly builds)
 - figure out a more clever way for termux
 - complete usage instructions for gmsh_plus_sfepy
+- offer four versions each
+  - heavy webtop with gmsh GUI, nightly-compiled
+  - light console only with nightly-compiled gmsh
