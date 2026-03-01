@@ -1,0 +1,30 @@
+#if something breaks, maybe stop using slim
+FROM python:3.12-slim
+
+#should probably replace this gmsh with a lightweight, non-GUI 'nightly' version of gmsh
+#currently consumes 800 MB
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
+    apt-get install -y --no-install-recommends \
+	git \
+	gmsh \
+    && rm -rf /var/lib/apt/lists/* 
+
+#version from pypi - currently commented out in favor of the 'nightly' below
+#RUN pip install --break-system-packages felupe[all]
+
+#install things directly from the current ('nightly') source code
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/felupe.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/contique.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/hyperelastic.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/matadi.git@main
+
+
+#i dont understand these ones, so they're commented out for now
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/statescale.git@main
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/tensortrax.git@main
+
+#lacking an X11 server (or similar), we really cannot use this one here, so commented out
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ZAARAOUI999/feplot.git@main
+
+
