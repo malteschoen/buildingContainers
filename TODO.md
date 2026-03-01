@@ -4,6 +4,7 @@
 - rework the sfepy container (install gmsh from ubuntu)
 - maybe add a 'fresh' bempp container (nightly builds)
 - figure out a more clever way for termux
+- move the gmsh files out of here, link the masterfile repo
 - complete usage instructions for gmsh_plus_sfepy
 - offer four versions each
   - heavy webtop with gmsh GUI, nightly-compiled
