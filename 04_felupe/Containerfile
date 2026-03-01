@@ -1,14 +1,17 @@
-#if something breaks, maybe stop using slim
-FROM python:3.12-slim
+# grab the container holding the nightly gmsh binary
+FROM ghcr.io/malteschoen/gmsh:latest AS binary-holder
 
-#should probably replace this gmsh with a lightweight, non-GUI 'nightly' version of gmsh
-#currently consumes 800 MB
+#if something breaks, maybe stop using slim
+FROM python:3.12-slim AS runner
+
+#copy over the gmsh binary 
+COPY --from=binary-holder /usr/local/bin/gmsh /usr/local/bin/gmsh
+
+#grab stuff needed for building pip-wheels (git)
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
     apt-get install -y --no-install-recommends \
-	git \
-	gmsh \
-    && rm -rf /var/lib/apt/lists/* 
+	git 
 
 #version from pypi - currently commented out in favor of the 'nightly' below
 #RUN pip install --break-system-packages felupe[all]
@@ -27,4 +30,14 @@ RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ad
 #lacking an X11 server (or similar), we really cannot use this one here, so commented out
 #RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ZAARAOUI999/feplot.git@main
 
+#grab stuff needed for gmsh to ingest step files, remove unneeded lists at the end
+#the copy-method is kinda useless now since we install x11 as req of libocct anyway
+#will need to provide gmsh the libs in another way
+#but for now...
 
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
+    apt-get install -y --no-install-recommends \
+        libocct-data-exchange-dev \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/* 

@@ -1,5 +1,5 @@
 ARG UBUNTU_VERSION=24.04
-FROM ubuntu:${UBUNTU_VERSION} AS builder
+FROM ubuntu:${UBUNTU_VERSION} AS runner
 
 # Install dependencies (mainly python and pocl)
 RUN apt-get update && \

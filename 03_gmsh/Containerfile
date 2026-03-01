@@ -1,7 +1,7 @@
 # Stage 1: Build gmsh from source
 FROM ubuntu:24.04 AS builder
 
-# Install build dependencies
+# Install build dependencies - will need cleanup in the future
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     libocct-foundation-dev \
@@ -22,7 +22,7 @@ RUN git clone https://gitlab.onelab.info/gmsh/gmsh.git .
 # might also use -DENABLE_BUILD_DYNAMIC=1 for gmsh APIs (e.g. Python)
 # probably not needed, like the 'make install'
 RUN mkdir build && cd build && \
-    cmake -DENABLE_FLTK=0 -DENABLE_BUILD_DYNAMIC=0 -DENABLE_OCC=1 .. && \
+    cmake -DENABLE_FLTK=0 -DENABLE_BUILD_DYNAMIC=0 -DENABLE_OPENGL=OFF -DENABLE_OCC=1 .. && \
     make -j$(nproc) && \
     make install
 
@@ -39,6 +39,7 @@ COPY --from=builder /usr/local/bin/gmsh /usr/local/bin/gmsh
 # ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # install what's needed for gmsh to ingest step files
+# quite inefficient, probably better to copy over the libs
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     #libocct-foundation-dev \
@@ -47,6 +48,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     #libocct-modeling-algorithms-dev \
     #libocct-modeling-data-dev \
     #libocct-ocaf-dev \
-    && rm -rf /var/lib/apt/lists/*
     && rm -rf /var/lib/apt/lists/*
 
