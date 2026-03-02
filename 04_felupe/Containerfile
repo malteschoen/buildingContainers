@@ -1,43 +1,76 @@
 # grab the container holding the nightly gmsh binary
-FROM ghcr.io/malteschoen/gmsh:latest AS binary-holder
+FROM ghcr.io/malteschoen/gmsh:arm64 AS binary-holder
 
 #if something breaks, maybe stop using slim
 FROM python:3.12-slim AS runner
-
-#copy over the gmsh binary 
-COPY --from=binary-holder /usr/local/bin/gmsh /usr/local/bin/gmsh
 
 #grab stuff needed for building pip-wheels (git)
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
     apt-get install -y --no-install-recommends \
-	git 
+	git \
+    && rm -rf /var/lib/apt/lists/* 
 
 #version from pypi - currently commented out in favor of the 'nightly' below
 #RUN pip install --break-system-packages felupe[all]
 
-#install things directly from the current ('nightly') source code
+#install felupe and addons directly from the current ('nightly') source code
 RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/felupe.git@main
 RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/contique.git@main
 RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/hyperelastic.git@main
 RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/matadi.git@main
 
 
-#i dont understand these ones, so they're commented out for now
+#i dont understand these felupe addons, so they're commented out for now
 #RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/statescale.git@main
 #RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/tensortrax.git@main
 
 #lacking an X11 server (or similar), we really cannot use this one here, so commented out
 #RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ZAARAOUI999/feplot.git@main
 
-#grab stuff needed for gmsh to ingest step files, remove unneeded lists at the end
-#the copy-method is kinda useless now since we install x11 as req of libocct anyway
-#will need to provide gmsh the libs in another way
-#but for now...
+#might wanna set these to installation via github
+#also might remove anything remove pyvista
+RUN pip install --no-cache-dir --break-system-packages einsumt jax h5py matplotlib meshio tqdm pyvista
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
-    apt-get install -y --no-install-recommends \
-        libocct-data-exchange-dev \
-        libgomp1 \
-    && rm -rf /var/lib/apt/lists/* 
+# Copy installed gmsh files from binary-holder
+COPY --from=binary-holder /usr/local/bin/gmsh /usr/local/bin/gmsh
+
+# Copy required libs from builder, currently optimized for python:3.12-slim in aarch64
+COPY --from=binary-holder /lib/aarch64-linux-gnu/libTK*.so.7.8 /lib/aarch64-linux-gnu/
+COPY --from=binary-holder \
+        /lib/aarch64-linux-gnu/libgomp.so.1 \
+	/lib/aarch64-linux-gnu/libtbb.so.12  \
+	/lib/aarch64-linux-gnu/libX11.so.6  \
+	/lib/aarch64-linux-gnu/libfontconfig.so.1 \ 
+	/lib/aarch64-linux-gnu/libfreeimage.so.3  \
+	/lib/aarch64-linux-gnu/libfreetype.so.6  \
+	/lib/aarch64-linux-gnu/libxcb.so.1  \
+	/lib/aarch64-linux-gnu/libexpat.so.1  \
+	/lib/aarch64-linux-gnu/libjxrglue.so.0  \
+	/lib/aarch64-linux-gnu/libjpeg.so.62  \
+	/lib/aarch64-linux-gnu/libopenjp2.so.7  \
+	/lib/aarch64-linux-gnu/libpng16.so.16  \
+	/lib/aarch64-linux-gnu/libraw.so.23  \
+	/lib/aarch64-linux-gnu/libtiff.so.6  \
+	/lib/aarch64-linux-gnu/libwebpmux.so.3  \
+	/lib/aarch64-linux-gnu/libOpenEXR-3_1.so.30  \
+	/lib/aarch64-linux-gnu/libIex-3_1.so.30  \
+	/lib/aarch64-linux-gnu/libImath-3_1.so.29  \
+	/lib/aarch64-linux-gnu/libpng16.so.16 \
+	/lib/aarch64-linux-gnu/libbrotlidec.so.1 \
+	/lib/aarch64-linux-gnu/libXau.so.6  \
+	/lib/aarch64-linux-gnu/libXdmcp.so.6  \
+	/lib/aarch64-linux-gnu/libjpegxr.so.0  \
+	/lib/aarch64-linux-gnu/liblcms2.so.2 \
+	/lib/aarch64-linux-gnu/libwebp.so.7  \
+	/lib/aarch64-linux-gnu/libLerc.so.4  \
+	/lib/aarch64-linux-gnu/libjbig.so.0  \
+	/lib/aarch64-linux-gnu/libdeflate.so.0  \
+	/lib/aarch64-linux-gnu/libwebp.so.7  \
+	/lib/aarch64-linux-gnu/libIlmThread-3_1.so.30 \
+	/lib/aarch64-linux-gnu/libbrotlicommon.so.1 \
+	/lib/aarch64-linux-gnu/libsharpyuv.so.0  \
+	/lib/aarch64-linux-gnu/
+
+# check if gmsh has the libraries it needs
+RUN ldd /usr/local/bin/gmsh
