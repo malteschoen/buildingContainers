@@ -1,36 +1,34 @@
 # grab the container holding the nightly gmsh binary
 FROM ghcr.io/malteschoen/gmsh:arm64 AS binary-holder
 
-#if something breaks, maybe stop using slim
-FROM python:3.12-slim AS runner
+#grab a slim (eyeroll) version of python
+FROM python:3.9-slim AS sfepy-python-builder
 
 #grab stuff needed for building pip-wheels (git)
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
     apt-get install -y --no-install-recommends \
 	git \
-    && rm -rf /var/lib/apt/lists/* 
+	build-essential 
 
-#version from pypi - currently commented out in favor of the 'nightly' below
-#RUN pip install --break-system-packages felupe[all]
+# Upgrade pip and install the wheel package
+RUN pip install --upgrade pip wheel
 
-#install felupe and addons directly from the current ('nightly') source code
-RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/felupe.git@main
-RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/contique.git@main
-RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/hyperelastic.git@main
-RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/matadi.git@main
+# Download/build  numpy/sfepy and requirements and store them under /wheels
+RUN pip wheel "numpy<2.0" "sfepy" -w /wheels
 
+# check if wheels are present
+RUN ls -lah /wheels
 
-#i dont understand these felupe addons, so they're commented out for now
-#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/statescale.git@main
-#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/tensortrax.git@main
+#appears to borked? no it isnt...
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/sfepy/sfepy.git@master
 
-#lacking an X11 server (or similar), we really cannot use this one here, so commented out
-#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ZAARAOUI999/feplot.git@main
+#grab a slim (eyeroll) version of python
+FROM python:3.9-slim AS runner
 
-#might wanna set these to installation via github
-#also might remove anything remove pyvista
-RUN pip install --no-cache-dir --break-system-packages einsumt jax h5py matplotlib meshio tqdm pyvista
+#copy over wheels from builder and install them
+COPY --from=sfepy-python-builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/*.whl
 
 # Copy installed gmsh files from binary-holder
 COPY --from=binary-holder /usr/local/bin/gmsh /usr/local/bin/gmsh
@@ -74,3 +72,4 @@ COPY --from=binary-holder \
 
 # check if gmsh has the libraries it needs
 RUN ldd /usr/local/bin/gmsh
+
