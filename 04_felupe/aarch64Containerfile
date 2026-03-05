@@ -1,0 +1,30 @@
+# grab the container holding the nightly gmsh binary as base
+FROM ghcr.io/malteschoen/gmsh:arm64
+
+#grab stuff needed for building pip-wheels (git)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
+    apt-get install -y --no-install-recommends \
+	git \
+    && rm -rf /var/lib/apt/lists/* 
+
+#version from pypi - currently commented out in favor of the 'nightly' below
+#RUN pip install --break-system-packages felupe[all]
+
+#install felupe and addons directly from the current ('nightly') source code
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/felupe.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/contique.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/hyperelastic.git@main
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/matadi.git@main
+
+
+#i dont understand these felupe addons, so they're commented out for now
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/statescale.git@main
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/adtzlr/tensortrax.git@main
+
+#lacking an X11 server (or similar), we really cannot use this one here, so commented out
+#RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ZAARAOUI999/feplot.git@main
+
+#might wanna set these to installation via github
+#also might remove anything related to graphical display (this is headless after all)
+RUN pip install --no-cache-dir --break-system-packages einsumt jax h5py matplotlib meshio tqdm pyvista
