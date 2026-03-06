@@ -1,0 +1,19 @@
+# FIRST STAGE: Build environment
+FROM docker.io/microfluidica/openfoam:2412
+
+# we will need git...
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+#set the environmental variables to use my big /shared/tmp as TMP instead of the tiny default one
+ENV TMPDIR=/shared/tmp\ TEMP=/shared/tmp\ TMP=/shared/tmp
+
+WORKDIR /shared/workspace
+
+# Clone the repo if needed
+#RUN git clone https://gitlab.com/interface-tracking/twophaseintertrackfoamrelease.git
+
+WORKDIR /shared/workspace/twophaseintertrackfoamrelease
+
+RUN ./Allwmake
