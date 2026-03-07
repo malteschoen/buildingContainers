@@ -1,6 +1,5 @@
 # grab the container holding the nightly gmsh binary as base
-# TODO: go to 'latest'
-FROM ghcr.io/malteschoen/gmsh:arm64
+FROM ghcr.io/malteschoen/gmsh:latest
 
 #grab stuff needed for building
 RUN apt-get update && \
@@ -15,9 +14,12 @@ RUN apt-get update && \
    	ca-certificates \
     && rm -rf /var/lib/apt/lists/* 
 
+#take stuff from my standard repo
 WORKDIR /shared/workspace
-RUN git https://github.com/malteschoen/armedMedusa.git --branch dev --single-branch
+RUN git clone https://github.com/malteschoen/armedMedusa.git --branch dev --single-branch
 
+#rename folder to accomodate python script
+RUN mv /shared/workspace/armedMedusa /shared/workspace/medusa
 WORKDIR /shared/workspace/medusa
-#export LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu/hdf5/serial:$LD_LIBRARY_PATH
+
 RUN python3 ./run_tests.py
