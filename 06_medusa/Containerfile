@@ -16,7 +16,8 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* 
 
 WORKDIR /shared/workspace
-RUN git clone https://gitlab.com/e62Lab/medusa.git --branch master --single-branch
+RUN git https://github.com/malteschoen/armedMedusa.git --branch dev --single-branch
 
 WORKDIR /shared/workspace/medusa
-RUN python3 ./run_tests.py -t
+#export LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu/hdf5/serial:$LD_LIBRARY_PATH
+RUN python3 ./run_tests.py
