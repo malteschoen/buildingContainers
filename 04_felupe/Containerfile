@@ -1,5 +1,5 @@
 # grab the container holding the nightly gmsh binary as base
-FROM ghcr.io/malteschoen/gmsh:arm64
+FROM ghcr.io/malteschoen/gmsh:latest
 
 #grab stuff needed for building pip-wheels (git)
 RUN apt-get update && \
@@ -27,4 +27,4 @@ RUN pip install --no-cache-dir --break-system-packages git+https://github.com/ad
 
 #might wanna set these to installation via github
 #also might remove anything related to graphical display (this is headless after all)
-RUN pip install --no-cache-dir --break-system-packages einsumt jax h5py matplotlib meshio tqdm pyvista
+RUN pip install --no-cache-dir --break-system-packages einsumt jax h5py matplotlib meshio tqdm pyvista pypardiso
