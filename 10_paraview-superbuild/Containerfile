@@ -33,23 +33,24 @@ RUN apt-get update  && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*           
 
 
-#set the environmental variables to use my big /shared/tmp as TMP instead of the tiny default one
-ENV TMPDIR=/shared/tmp
-ENV TEMP=/shared/tmp
-ENV TMP=/shared/tmp
+#set the environmental variables to use my big /offloaded/tmp as TMP instead of the tiny default one
+ENV TMPDIR=/offloaded/tmp
+ENV TEMP=/offloaded/tmp
+ENV TMP=/offloaded/tmp
 
 # Set the working directory
-WORKDIR /shared/workspace
+# permissible if there is a genuine install (or copying of libs/executables) step later
+WORKDIR /offloaded/repoDownload
 
 # Clone the ParaView Superbuild repository
 RUN if [ ! -d "paraview-superbuild" ]; then git clone https://gitlab.kitware.com/paraview/paraview-superbuild.git; fi
-WORKDIR /shared/workspace/paraview-superbuild
+WORKDIR /offloaded/repoDownload/paraview-superbuild
 RUN git submodule init
 RUN git checkout v5.12.1
 RUN git submodule update
 
 # Set the working directory to the ParaView Superbuild directory
-WORKDIR /shared/workspace/paraview-superbuild
+WORKDIR /offloaded/repoDownload/paraview-superbuild
 
 # Configure and build ParaView with OSMesa enabled
 # ToDo: make mkdir conditional
@@ -59,8 +60,8 @@ RUN cd build \
     && make -j4  
 
 # Set environment variables for ParaView
-ENV PATH="/shared/workspace/paraview-superbuild/build/install/bin:${PATH}"
-ENV LD_LIBRARY_PATH="/shared/workspace/paraview-superbuild/build/install/lib:${LD_LIBRARY_PATH}"
-ENV PYTHONPATH=/shared/workspace/paraview-superbuild/build/install/lib/python3.12/site-packages:$PYTHONPATH
+ENV PATH="/offloaded/repoDownload/paraview-superbuild/build/install/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/offloaded/repoDownload/paraview-superbuild/build/install/lib:${LD_LIBRARY_PATH}"
+ENV PYTHONPATH=/offloaded/repoDownload/paraview-superbuild/build/install/lib/python3.12/site-packages:$PYTHONPATH
 
 

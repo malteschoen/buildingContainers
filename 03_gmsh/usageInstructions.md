@@ -2,7 +2,7 @@
 
 ### usage when building image for arm64/aarch64:
 ```
-podman build --volume /media/xubuntu/jesus1/shared:/shared --arch arm64 -t ghcr.io/malteschoen/gmsh:arm64 
+podman build --volume /media/xubuntu/jesus1/podman/offloaded:/offloaded --arch arm64 -t ghcr.io/malteschoen/gmsh:arm64 
 ```
 ### usage when building image for amd64/x86-64:
 ```

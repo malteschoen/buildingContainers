@@ -15,11 +15,12 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* 
 
 #take stuff from my standard repo
-WORKDIR /shared/workspace
+WORKDIR /repoDownload
 RUN git clone https://github.com/malteschoen/armedMedusa.git --branch dev --single-branch
 
 #rename folder to accomodate python script
-RUN mv /shared/workspace/armedMedusa /shared/workspace/medusa
-WORKDIR /shared/workspace/medusa
+#TODO: change python script itself
+RUN mv /repoDownload/armedMedusa /repoDownload/medusa
+WORKDIR /repoDownload/medusa
 
 RUN python3 ./run_tests.py

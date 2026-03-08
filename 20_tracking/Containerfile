@@ -5,15 +5,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-#set the environmental variables to use my big /shared/tmp as TMP instead of the tiny default one
-ENV TMPDIR=/shared/tmp\ TEMP=/shared/tmp\ TMP=/shared/tmp
-
-WORKDIR /shared/workspace
+WORKDIR /repoDownload
 
 # Clone the repo if needed
 # ToDo: make conditional (don't clone if already existing)
 RUN git clone https://gitlab.com/interface-tracking/twophaseintertrackfoamrelease.git
 
 # Compile
-WORKDIR /shared/workspace/twophaseintertrackfoamrelease
+WORKDIR /repoDownload/twophaseintertrackfoamrelease
 RUN ./Allwmake
