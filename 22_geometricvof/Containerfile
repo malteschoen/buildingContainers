@@ -1,0 +1,47 @@
+# get OpenFOAM 2512
+FROM docker.io/microfluidica/openfoam:2512
+
+#RUN whoami
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+#switch to openfoam user to have application on his PATH
+#using root causes issues with #calc e.g. in blockMesh
+USER  ubuntu
+#RUN whoami
+
+#needed for setting folder downstream
+RUN echo $WM_PROJECT_USER_DIR
+
+#set the environmental variables to use my big /offloaded/tmp as TMP instead of the tiny default one
+ENV TMPDIR=/offloaded/tmp TEMP=/offloaded/tmp TMP=/offloaded/tmp
+
+# Go to folder where repo will be downloaded to
+WORKDIR /home/ubuntu/OpenFOAM/user-v2512
+RUN mkdir modules
+WORKDIR /home/ubuntu/OpenFOAM/user-v2512/modules
+
+# Clone repository - comment out if already cloned
+# ToDo: make conditional (don't clone if already existing)
+RUN git clone https://github.com/daidezhi/geometricVofExt
+
+WORKDIR /home/ubuntu/OpenFOAM/user-v2512/modules/geometricVofExt
+#RUN pwd
+#RUN ls -lah
+RUN ./checkCGAL
+
+#DO NOT recompile CGAL to increase efficiency of setVofField and setShapedFields  
+#RUN ./compileCGALWithGMPAndMPFRUsingSystemGCCInOpenFOAM2512
+
+#Enable the utilities and solvers to produce iso-surfaces/plic-surfaces at the initial time 
+RUN ./enableInitialTimeWriting
+
+#main course - solver applications plus libs compilation
+RUN ./Allwmake
+
+RUN interPlicFoam -help
+RUN which interPlicFoam
