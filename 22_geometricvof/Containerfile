@@ -1,47 +1,63 @@
-# get OpenFOAM 2512
-FROM docker.io/microfluidica/openfoam:2512
+# Stage 1:get OpenFOAM 2512 as builder
+FROM docker.io/microfluidica/openfoam:2512 as builder
 
-#RUN whoami
+RUN whoami
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     nano \
+    libcgal-dev	\
     && rm -rf /var/lib/apt/lists/*
-
-#switch to openfoam user to have application on his PATH
-#using root causes issues with #calc e.g. in blockMesh
-USER  ubuntu
-#RUN whoami
 
 #needed for setting folder downstream
 RUN echo $WM_PROJECT_USER_DIR
 
-#set the environmental variables to use my big /offloaded/tmp as TMP instead of the tiny default one
-ENV TMPDIR=/offloaded/tmp TEMP=/offloaded/tmp TMP=/offloaded/tmp
-
 # Go to folder where repo will be downloaded to
-WORKDIR /home/ubuntu/OpenFOAM/user-v2512
+WORKDIR /root/OpenFOAM/user-v2512
 RUN mkdir modules
-WORKDIR /home/ubuntu/OpenFOAM/user-v2512/modules
+WORKDIR /root/OpenFOAM/user-v2512/modules
 
 # Clone repository - comment out if already cloned
 # ToDo: make conditional (don't clone if already existing)
 RUN git clone https://github.com/daidezhi/geometricVofExt
 
-WORKDIR /home/ubuntu/OpenFOAM/user-v2512/modules/geometricVofExt
+WORKDIR /root/OpenFOAM/user-v2512/modules/geometricVofExt
 #RUN pwd
 #RUN ls -lah
 RUN ./checkCGAL
 
-#DO NOT recompile CGAL to increase efficiency of setVofField and setShapedFields  
+# DO NOT recompile CGAL to increase efficiency of setVofField and setShapedFields  
 #RUN ./compileCGALWithGMPAndMPFRUsingSystemGCCInOpenFOAM2512
 
-#Enable the utilities and solvers to produce iso-surfaces/plic-surfaces at the initial time 
-RUN ./enableInitialTimeWriting
+# DO NOT Enable the utilities and solvers to produce iso-surfaces/plic-surfaces at the initial time 
+# TO DO - revisit this and see what exactly it creates where and think about the best way to copy to the runner
+#RUN ./enableInitialTimeWriting
 
 #main course - solver applications plus libs compilation
 RUN ./Allwmake
 
+# check if compilation succeeded and where compiled solver lives
 RUN interPlicFoam -help
 RUN which interPlicFoam
+
+# Idea for Stage 2: get OpenFOAM 2512-slim as runner - doesnt work with #calc and codedFixedValue, all the good stuff using dynamicMeshDict
+# so say goodbye to slim and use normal 2512 :-(
+FROM docker.io/microfluidica/openfoam:2512 AS runner
+
+# add user named 'openfoam'
+RUN useradd -m -s /bin/bash openfoam
+
+#switch to that user
+USER openfoam
+
+#validate that switch worked
+#RUN whoami
+
+# copy the $FOAM_USER_APPBIN and $FOAM_USER_LIBBIN - doesnt work
+#COPY --from=builder $FOAM_USER_APPBIN $FOAM_USER_APPBIN - doesnt work
+#COPY --from=builder $FOAM_USER_LIBBIN $FOAM_USER_LIBBIN - doesnt work
+
+# copy the $FOAM_USER_APPBIN and $FOAM_USER_LIBBIN manually - will need adjustment between aarch64/arm64 and x86_64/amd64
+COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib
+COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/bin /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/bin
