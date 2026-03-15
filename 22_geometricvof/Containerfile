@@ -59,5 +59,11 @@ USER openfoam
 #COPY --from=builder $FOAM_USER_LIBBIN $FOAM_USER_LIBBIN - doesnt work
 
 # copy the $FOAM_USER_APPBIN and $FOAM_USER_LIBBIN manually - will need adjustment between aarch64/arm64 and x86_64/amd64
+# normal libs
 COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib
+# udocker libs
+COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib /home/openfoam/OpenFOAM/openfoam-v2512/platforms/linuxARM64GccDPInt32Opt/lib
+# normal libs
+COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/bin /home/openfoam/OpenFOAM/openfoam-v2512/platforms/linuxARM64GccDPInt32Opt/bin
+# udocker libs
 COPY --from=builder /root/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/bin /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/bin
