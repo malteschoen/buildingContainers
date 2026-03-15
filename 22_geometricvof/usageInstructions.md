@@ -16,3 +16,6 @@ podman run --user=openfoam -it -v /media/xubuntu/jesus1/github:/shared ghcr.io/m
 /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib /home/openfoam/OpenFOAM/user-v2512/platforms/linuxARM64GccDPInt32Opt/lib
 
 sudo  chmod -R a+rwX ./geometricVofExt/
+
+export LD_LIBRARY_PATH=$(pwd):$LD_LIBRARY_PATH
+export PATH="$PATH:$(pwd)"
