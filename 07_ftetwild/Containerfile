@@ -36,7 +36,7 @@ RUN cmake .. -DCMAKE_PROJECT_INCLUDE=/repoDownload/fTetWild/policy_override.cmak
 FROM ghcr.io/malteschoen/gmsh:latest AS runner
 
 # Copy compiled binary from builder
-COPY --from=builder /repoDownload/build/float_ftetwild.bin /usr/local/bin/float_ftetwild.bin
+COPY --from=builder /repoDownload/fTetWild/build/FloatTetwild_bin  /usr/local/bin/FloatTetwild_bin 
 
 # check if ftetwild has the libraries it needs
-RUN ldd /usr/local/bin/float_ftetwild.bin
+RUN ldd /usr/local/bin/FloatTetwild_bin
