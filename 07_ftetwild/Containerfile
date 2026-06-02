@@ -4,7 +4,8 @@ FROM ghcr.io/malteschoen/gmsh:latest AS builder
 # Install build dependencies - will need cleanup in the future
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    cmake=3.22.* \
+    cmake \
+    libgmp-dev \
     build-essential \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -22,9 +23,13 @@ RUN git clone https://github.com/wildmeshing/fTetWild
 # ToDo: make mkdir conditional (don't clone if already existing)
 
 WORKDIR /repoDownload/fTetWild
+
+# Inject CMP0169 policy globally
+RUN printf "cmake_policy(SET CMP0169 OLD)\n" > /repoDownload/fTetWild/policy_override.cmake
+
 RUN mkdir build 
-RUN cd build && \
-    cmake .. -DCMAKE_POLICY_DEFAULT_CMP0169=OLD -DCMAKE_BUILD_TYPE=Release && \
+WORKDIR /repoDownload/fTetWild/build
+RUN cmake .. -DCMAKE_PROJECT_INCLUDE=/repoDownload/fTetWild/policy_override.cmake -DCMAKE_BUILD_TYPE=Release && \
     make -j$(nproc) 
 
 # Stage 2: grab my gmsh runner (!) image and use it as a runner this time
