@@ -1,0 +1,27 @@
+# Stage 1: grab my gmsh runner (!) image, but use it as builder for now
+FROM ghcr.io/malteschoen/gmsh:latest AS builder
+
+# Install build dependencies - will need cleanup in the future
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    cmake \
+    libgmp-dev \
+    build-essential \
+	libtbb-dev \
+    ca-certificates \
+	libx11-dev libxcb1-dev libxau-dev libxdmcp-dev \
+	libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Go to folder where repo will be downloaded to
+# permissible as there is a genuine install step below
+WORKDIR /repoDownload
+
+# Clone geogram repository - comment out if already cloned
+RUN git clone --recurse-submodules https://github.com/BrunoLevy/geogram.git
+
+
+WORKDIR /repoDownload/geogram
+RUN ./configure.sh Linux64-nonx86-gcc-dynamic 
+WORKDIR /repoDownload/geogram/build/Linux64-nonx86-gcc-dynamic-Release
+RUN make

@@ -28,9 +28,13 @@ WORKDIR /repoDownload/fTetWild
 RUN printf "cmake_policy(SET CMP0169 OLD)\n" > /repoDownload/fTetWild/policy_override.cmake
 
 RUN mkdir build 
-WORKDIR /repoDownload/fTetWild/build
-RUN cmake .. -DCMAKE_PROJECT_INCLUDE=/repoDownload/fTetWild/policy_override.cmake -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc) 
+RUN cmake -S . -B build \
+  -DCMAKE_PROJECT_INCLUDE=/repoDownload/fTetWild/policy_override.cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DVORPALINE_PLATFORM=Linux64-gcc-aarch64 \
+  -DCMAKE_VERBOSE_MAKEFILE=ON
+
+RUN cmake --build build -j 1 --verbose
 
 # Stage 2: grab my gmsh runner (!) image and use it as a runner this time
 FROM ghcr.io/malteschoen/gmsh:latest AS runner
