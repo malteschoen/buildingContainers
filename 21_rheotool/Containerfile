@@ -1,10 +1,10 @@
 FROM docker.io/dicehub/openfoam:9
 
 # we will need git...
-RUN sudo apt-get update && apt-get install -y --no-install-recommends \
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     git \
     wget \
-    && rm -rf /var/lib/apt/lists/*
+    && sudo rm -rf /var/lib/apt/lists/*
 
 WORKDIR $HOME/repoDownload
 
@@ -12,14 +12,18 @@ WORKDIR $HOME/repoDownload
 # ToDo: make conditional (don't clone if already existing)
 RUN git clone https://github.com/fppimenta/rheoTool.git
 
-# Compile
-WORKDIR $HOME/repoDownload/rheoTool/of9
+# source bashrc for OF9
+# RUN "/bin/bash echo $FOAM_ETC"
 
+# Compile
+WORKDIR $HOME/repoDownload/rheoTool/of90
 
 RUN "./downloadEigen"
 #current missing the writing of eigen folder into .bashrc and the re-sourcing of it
 
 RUN "./installPetsc"
 #pretty sure this also has some weird manual steps in it
+
+WORKDIR $HOME/repoDownload/rheoTool/of90/src
 
 RUN  "./Allwmake"
