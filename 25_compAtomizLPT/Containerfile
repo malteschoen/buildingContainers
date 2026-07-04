@@ -1,0 +1,16 @@
+FROM docker.io/dicehub/openfoam:2112
+
+# we will need git...
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+    git \
+    wget \
+    && sudo rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repoDownload
+
+# Clone the repo if needed
+# ToDo: make conditional (don't clone if already existing)
+RUN git clone https://github.com/malteschoen/CompressibleInterIso-LptFoam
+
+WORKDIR /repoDownload/CompressibleInterIso-LptFoam
+RUN	./Allwmake

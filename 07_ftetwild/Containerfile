@@ -1,4 +1,5 @@
-# Stage 1: grab my gmsh runner (!) image, but use it as builder for now
+# Stage 1: grab my geogram image, but use it as builder for now (will need to switched to something lighter and not locked into arm64)
+#FROM ghcr.io/malteschoen/geogram:arm64 AS builder
 FROM ghcr.io/malteschoen/gmsh:latest AS builder
 
 # Install build dependencies - will need cleanup in the future
@@ -8,15 +9,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgmp-dev \
     build-essential \
     ca-certificates \
+    # maybe compile tbb in-situ?
+    libtbb-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Go to folder where repo will be downloaded to
 # permissible as there is a genuine install step below
 WORKDIR /repoDownload
 
-# Clone ftetwild repository - comment out if already cloned
+# Clone my personal fork of ftetwild repository - comment out if already cloned
 # ToDo: make conditional (don't clone if already existing)
-RUN git clone https://github.com/wildmeshing/fTetWild
+RUN git clone https://github.com/malteschoen/fTetWild
 
 # Create build directory and run cmake & make
 # make sure to comment out the 'mkdir build' if it already exists
@@ -31,10 +34,9 @@ RUN mkdir build
 RUN cmake -S . -B build \
   -DCMAKE_PROJECT_INCLUDE=/repoDownload/fTetWild/policy_override.cmake \
   -DCMAKE_BUILD_TYPE=Release \
-  -DVORPALINE_PLATFORM=Linux64-gcc-aarch64 \
   -DCMAKE_VERBOSE_MAKEFILE=ON
 
-RUN cmake --build build -j 1 --verbose
+RUN cmake --build build -j 1
 
 # Stage 2: grab my gmsh runner (!) image and use it as a runner this time
 FROM ghcr.io/malteschoen/gmsh:latest AS runner
