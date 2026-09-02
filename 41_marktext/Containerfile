@@ -1,0 +1,26 @@
+FROM docker.io/node:24
+
+# we will need git...
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    ca-certificates \
+	xorg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repoDownload
+
+# Clone the repo if needed
+RUN git clone https://github.com/marktext/marktext
+
+WORKDIR /repoDownload/marktext
+
+RUN corepack enable
+RUN pnpm install
+
+WORKDIR /repoDownload/marktext/packages/desktop
+
+RUN pnpm exec tsx ../../scripts/minify-locales.ts
+RUN pnpm exec electron-rebuild
+RUN pnpm exec electron-vite build
+RUN pnpm exec electron-builder --linux AppImage --publish never
