@@ -1,0 +1,44 @@
+# Stage 1: grab builder image
+FROM ubuntu:noble AS builder
+
+# Install build dependencies - will need cleanup in the future
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+	ca-certificates \
+	cmake \
+	meson \
+	libepoxy-dev \
+    libgtkmm-4.0-dev \
+    libcairomm-1.16-dev \
+	build-essential \
+	libglm-dev \
+	libocct-ocaf-dev \
+	pkg-config \
+	uuid-dev  \
+	libeigen3-dev \
+	libspnav-dev \
+	python3-gi-cairo \
+	pybind11-dev \
+	python3-gi \
+	python-gi-dev \
+	gir1.2-rsvg-2.0  \
+	libocct-data-exchange-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Go to folder where repo will be downloaded to
+WORKDIR /repoDownload
+
+# Clone neosolve repository 
+RUN git clone https://github.com/0xSeren/neosolve
+
+# compile
+WORKDIR /repoDownload/neosolve
+RUN git submodule update --init
+RUN PATH=/usr/bin:/bin meson setup build
+RUN PATH=/usr/bin:/bin meson compile -C build
+
+# output
+RUN cp -v /repoDownload/dune3d/build/dune3d /shared/build/dune3d
+
+# to install on NOBLE host system i
+# sudo apt install uuid-dev libepoxy-dev libgtkmm-4.0-dev libcairomm-1.16-dev libocct-foundation-7.6t64  libocct-modeling-data-7.6t64 libocct-modeling-algorithms-7.6t64  	libocct-ocaf-7.6t64
