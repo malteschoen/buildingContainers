@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
 	ca-certificates \
 	cmake \
+	build-essential \
     zlib1g-dev \
 	libpng-dev \
     libcairo2-dev \
@@ -35,7 +36,7 @@ RUN git submodule update --init
 #build
 RUN mkdir build
 WORKDIR /repoDownload/neosolve/build
-RUN  cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP=ON  &&  make -j$(nproc)
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP=ON  &&  make -j$(nproc)
 
 
 # output
