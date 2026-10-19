@@ -1,0 +1,27 @@
+# Stage 1: grab builder image
+FROM docker.io/termux/termux-docker 
+
+# install what i need
+RUN pkg install \
+    git
+
+# Go to folder where repo will be downloaded to
+WORKDIR /repoDownload
+
+# Clone neosolve repository 
+RUN git clone https://github.com/solvespace/solvespace
+
+# submodules
+WORKDIR /repoDownload/solvespace
+RUN git submodule update --init
+
+#build
+RUN mkdir build
+WORKDIR /repoDownload/solvespace/build
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP=ON  &&  make -j$(nproc)
+
+
+# output
+RUN cp -vfr /repoDownload/solvespace/build /shared/build
+
+
