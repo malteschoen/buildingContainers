@@ -1,27 +1,25 @@
 # Stage 1: grab builder image
-FROM docker.io/termux/termux-docker 
+FROM docker.io/termux/termux-docker
+USER system 
+SHELL ["sh", "-c"]
+WORKDIR /data/data/com.termux/files/home
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["login"]
 
 # install what i need
-RUN pkg install \
-    git
+RUN pkg install -y git build-essential libxft
 
 # Go to folder where repo will be downloaded to
 WORKDIR /repoDownload
 
-# Clone neosolve repository 
-RUN git clone https://github.com/solvespace/solvespace
+# Clone occt repository 
+RUN git clone https://github.com/Open-Cascade-SAS/OCCT
 
 # submodules
-WORKDIR /repoDownload/solvespace
-RUN git submodule update --init
+WORKDIR /repoDownload/OCCT
 
 #build
 RUN mkdir build
-WORKDIR /repoDownload/solvespace/build
-RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP=ON  &&  make -j$(nproc)
-
-
-# output
-RUN cp -vfr /repoDownload/solvespace/build /shared/build
-
+WORKDIR /repoDownload/OCCT/build
+RUN cmake .. &&  make -j$(nproc)
 

@@ -11,3 +11,7 @@ podman build  --volume $PWD":/shared --arch amd64 -t ghcr.io/malteschoen/dune3d:
 ```
 podman run -it --volume $PWD":/shared ghcr.io/malteschoen/dune3d:latest /bin/bash
 ```
+### required installs on NOBLE host system
+```
+sudo apt install uuid-dev libepoxy-dev libgtkmm-4.0-dev libcairomm-1.16-dev libocct-foundation-7.6t64  libocct-modeling-data-7.6t64 libocct-modeling-algorithms-7.6t64 libocct-ocaf-7.6t64
+```

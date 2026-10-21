@@ -38,6 +38,3 @@ RUN PATH=/usr/bin:/bin meson compile -C build
 
 # output
 RUN cp -v /repoDownload/dune3d/build/dune3d /shared/build/dune3d
-
-# to install on NOBLE host system i
-# sudo apt install uuid-dev libepoxy-dev libgtkmm-4.0-dev libcairomm-1.16-dev libocct-foundation-7.6t64  libocct-modeling-data-7.6t64 libocct-modeling-algorithms-7.6t64 libocct-ocaf-7.6t64
