@@ -41,7 +41,3 @@ RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENMP=ON  &&  make -j$(nproc)
 
 # output
 RUN cp -vfr /repoDownload/neosolve/build /shared/build
-
-
-# to install on NOBLE host system i
-# sudo apt install 

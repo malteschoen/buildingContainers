@@ -11,3 +11,10 @@ podman build  --volume $PWD":/shared --arch amd64 -t ghcr.io/malteschoen/neosolv
 ```
 podman run -it --volume $PWD":/shared ghcr.io/malteschoen/neosolve:latest /bin/bash
 ```
+
+
+
+### required installs on NOBLE host system
+```
+sudo apt install 
+```
